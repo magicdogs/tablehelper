@@ -27,6 +27,7 @@ import java.util.List;
 public class ModifyTableSqlSource implements SqlSource {
 
     private static final String SQL = "sql";
+    public static final String SUFFIX_TOKEN = "`";
     private SqlSource sqlSource;
     private String suffix;
 
@@ -72,7 +73,7 @@ public class ModifyTableSqlSource implements SqlSource {
         List<Table> tables = delete.getTables();
         if(!tables.isEmpty()){
             tables.forEach(table -> {
-                table.setName(table.getName().concat(this.suffix));
+                table.setName(getTableName(table));
             });
         }
         Table table = delete.getTable();
@@ -80,9 +81,21 @@ public class ModifyTableSqlSource implements SqlSource {
         setSqlValue(boundSql,delete.toString());
     }
 
+    private String getTableName(Table table) {
+        String origin = table.getName();
+        if(origin.endsWith(SUFFIX_TOKEN)){
+            StringBuilder builder = new StringBuilder(origin);
+            builder.deleteCharAt(builder.length() - 1)
+                    .append(this.suffix)
+                    .append(SUFFIX_TOKEN);
+            return builder.toString();
+        }
+        return origin.concat(this.suffix);
+    }
+
     private void processInsert(Insert insert, BoundSql boundSql) {
         Table table = insert.getTable();
-        table.setName(table.getName().concat(this.suffix));
+        table.setName(getTableName(table));
         setSqlValue(boundSql,insert.toString());
     }
 
@@ -90,7 +103,7 @@ public class ModifyTableSqlSource implements SqlSource {
         List<Table> tables = update.getTables();
         if(!tables.isEmpty()){
             tables.forEach(table -> {
-                table.setName(table.getName().concat(this.suffix));
+                table.setName(getTableName(table));
             });
             setSqlValue(boundSql,update.toString());
         }
@@ -102,8 +115,7 @@ public class ModifyTableSqlSource implements SqlSource {
         SelectDeParser parser = new SelectDeParser(expressionDeParser, buffer) {
             @Override
             public void visit(Table table) {
-                String originTableName = table.getName();
-                table.setName(originTableName.concat(suffix));
+                table.setName(getTableName(table));
                 super.visit(table);
             }
         };
