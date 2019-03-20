@@ -85,6 +85,9 @@ public class ModifyTableSqlSource implements SqlSource {
 
     private String getTableName(Table table) {
         String origin = table.getName();
+        if(Objects.isNull(this.suffix)){
+            return origin;
+        }
         if(origin.endsWith(SUFFIX_TOKEN)){
             StringBuilder builder = new StringBuilder(origin);
             builder.deleteCharAt(builder.length() - 1)
@@ -92,9 +95,6 @@ public class ModifyTableSqlSource implements SqlSource {
                     .append(SUFFIX_TOKEN);
             return builder.toString();
         }else{
-            if(Objects.isNull(this.suffix)){
-                return origin;
-            }
             return origin.concat(this.suffix);
         }
     }
