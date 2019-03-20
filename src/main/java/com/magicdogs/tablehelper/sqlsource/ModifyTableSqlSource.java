@@ -1,5 +1,6 @@
 package com.magicdogs.tablehelper.sqlsource;
 
+import com.magicdogs.tablehelper.TableNameHelper;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Table;
@@ -17,6 +18,7 @@ import org.apache.ibatis.reflection.SystemMetaObject;
 
 import java.io.StringReader;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author magic
@@ -31,9 +33,8 @@ public class ModifyTableSqlSource implements SqlSource {
     private SqlSource sqlSource;
     private String suffix;
 
-    public ModifyTableSqlSource(SqlSource sqlSource,String suffix){
+    public ModifyTableSqlSource(SqlSource sqlSource){
         this.sqlSource = sqlSource;
-        this.suffix = suffix;
     }
 
     @Override
@@ -41,6 +42,7 @@ public class ModifyTableSqlSource implements SqlSource {
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
         try {
             Statement statement = CCJSqlParserUtil.parse(new StringReader(boundSql.getSql()));
+            this.suffix = TableNameHelper.take();
             processStatement(statement,boundSql);
         } catch (JSQLParserException e) {
             /*e.printStackTrace();*/
@@ -77,7 +79,7 @@ public class ModifyTableSqlSource implements SqlSource {
             });
         }
         Table table = delete.getTable();
-        table.setName(table.getName().concat(this.suffix));
+        table.setName(getTableName(table));
         setSqlValue(boundSql,delete.toString());
     }
 
@@ -89,8 +91,12 @@ public class ModifyTableSqlSource implements SqlSource {
                     .append(this.suffix)
                     .append(SUFFIX_TOKEN);
             return builder.toString();
+        }else{
+            if(Objects.isNull(this.suffix)){
+                return origin;
+            }
+            return origin.concat(this.suffix);
         }
-        return origin.concat(this.suffix);
     }
 
     private void processInsert(Insert insert, BoundSql boundSql) {

@@ -1,7 +1,6 @@
 package com.magicdogs.tablehelper.plugin;
 
 import com.magicdogs.tablehelper.sqlsource.ModifyTableSqlSource;
-import com.magicdogs.tablehelper.TableNameHelper;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlSource;
@@ -10,7 +9,6 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
-import org.springframework.util.StringUtils;
 
 import java.util.Properties;
 
@@ -31,11 +29,10 @@ public class ModifyTableNameInterceptor implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         Object[] args = invocation.getArgs();
-        String suffix = TableNameHelper.take();
-        if(StringUtils.hasLength(suffix)){
-            MappedStatement ms = (MappedStatement) args[0];
-            SqlSource sqlSource = ms.getSqlSource();
-            ModifyTableSqlSource modifyTableSqlSource = new ModifyTableSqlSource(sqlSource,suffix);
+        MappedStatement ms = (MappedStatement) args[0];
+        SqlSource sqlSource = ms.getSqlSource();
+        if(!(sqlSource instanceof ModifyTableSqlSource)){
+            ModifyTableSqlSource modifyTableSqlSource = new ModifyTableSqlSource(sqlSource);
             MetaObject msObject = SystemMetaObject.forObject(ms);
             msObject.setValue(SQL_SOURCE, modifyTableSqlSource);
         }
