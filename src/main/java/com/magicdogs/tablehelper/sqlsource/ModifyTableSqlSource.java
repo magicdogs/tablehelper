@@ -87,7 +87,7 @@ public class ModifyTableSqlSource implements SqlSource {
     private String getTableName(Table table) {
         String origin = table.getName();
         if(Objects.isNull(options.getSuffix())
-                || options.getExcludes().contains(origin)){
+                || options.getExcludes().contains(replaceTableToken(origin))){
             return origin;
         }
         if(origin.endsWith(SUFFIX_TOKEN)){
@@ -99,6 +99,10 @@ public class ModifyTableSqlSource implements SqlSource {
         }else{
             return origin.concat(options.getSuffix());
         }
+    }
+
+    private String replaceTableToken(String origin) {
+        return origin.replaceAll(SUFFIX_TOKEN,"");
     }
 
     private void processInsert(Insert insert, BoundSql boundSql) {
