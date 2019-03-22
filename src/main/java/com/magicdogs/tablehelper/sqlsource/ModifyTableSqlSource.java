@@ -1,6 +1,7 @@
 package com.magicdogs.tablehelper.sqlsource;
 
 import com.magicdogs.tablehelper.TableNameHelper;
+import com.magicdogs.tablehelper.options.Options;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Table;
@@ -31,7 +32,7 @@ public class ModifyTableSqlSource implements SqlSource {
     private static final String SQL = "sql";
     public static final String SUFFIX_TOKEN = "`";
     private SqlSource sqlSource;
-    private String suffix;
+    private Options options;
 
     public ModifyTableSqlSource(SqlSource sqlSource){
         this.sqlSource = sqlSource;
@@ -42,7 +43,7 @@ public class ModifyTableSqlSource implements SqlSource {
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
         try {
             Statement statement = CCJSqlParserUtil.parse(new StringReader(boundSql.getSql()));
-            this.suffix = TableNameHelper.take();
+            this.options = TableNameHelper.take();
             processStatement(statement,boundSql);
         } catch (JSQLParserException e) {
             /*e.printStackTrace();*/
@@ -85,17 +86,18 @@ public class ModifyTableSqlSource implements SqlSource {
 
     private String getTableName(Table table) {
         String origin = table.getName();
-        if(Objects.isNull(this.suffix)){
+        if(Objects.isNull(options.getSuffix())
+                || options.getExcludes().contains(origin)){
             return origin;
         }
         if(origin.endsWith(SUFFIX_TOKEN)){
             StringBuilder builder = new StringBuilder(origin);
             builder.deleteCharAt(builder.length() - 1)
-                    .append(this.suffix)
+                    .append(options.getSuffix())
                     .append(SUFFIX_TOKEN);
             return builder.toString();
         }else{
-            return origin.concat(this.suffix);
+            return origin.concat(options.getSuffix());
         }
     }
 

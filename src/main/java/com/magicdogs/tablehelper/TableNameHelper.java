@@ -1,5 +1,7 @@
 package com.magicdogs.tablehelper;
 
+import com.magicdogs.tablehelper.options.Options;
+
 /**
  * @author magic
  * @date 2019/3/5/005 14:20
@@ -7,14 +9,19 @@ package com.magicdogs.tablehelper;
  * Description TableNameModifyHelper
  */
 public class TableNameHelper {
-    private static final ThreadLocal<String> STRING_THREAD_LOCAL = new ThreadLocal<>();
-    public static void suffix(String name){
-        STRING_THREAD_LOCAL.set(name);
+
+    private static final ThreadLocal<Options> SUFFIX_THREAD_LOCAL = new ThreadLocal<>();
+
+    public static Options suffix(String name){
+        Options options = new Options(name);
+        SUFFIX_THREAD_LOCAL.set(options);
+        return options;
     }
 
-    public static String take(){
-        String result = STRING_THREAD_LOCAL.get();
-        STRING_THREAD_LOCAL.remove();
+    public static Options take(){
+        Options result = SUFFIX_THREAD_LOCAL.get();
+        SUFFIX_THREAD_LOCAL.remove();
         return result;
     }
+
 }
