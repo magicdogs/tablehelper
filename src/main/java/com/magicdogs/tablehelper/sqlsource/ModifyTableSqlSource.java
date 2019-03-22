@@ -86,8 +86,11 @@ public class ModifyTableSqlSource implements SqlSource {
 
     private String getTableName(Table table) {
         String origin = table.getName();
-        if(Objects.isNull(options.getSuffix())
-                || options.getExcludes().contains(replaceTableToken(origin))){
+        if(Objects.isNull(options) || Objects.isNull(options.getSuffix())){
+            return origin;
+        }
+        if(Objects.nonNull(options.getExcludes())
+                && options.getExcludes().contains(replaceTableToken(origin))){
             return origin;
         }
         if(origin.endsWith(SUFFIX_TOKEN)){
