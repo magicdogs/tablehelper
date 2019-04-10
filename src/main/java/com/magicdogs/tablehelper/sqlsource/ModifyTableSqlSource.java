@@ -86,22 +86,30 @@ public class ModifyTableSqlSource implements SqlSource {
 
     private String getTableName(Table table) {
         String origin = table.getName();
-        if(Objects.isNull(options) || Objects.isNull(options.getSuffix())){
+        if(Objects.isNull(options)){
+            return origin;
+        }
+        if(Objects.isNull(options.getSuffix()) && options.getRenames().isEmpty()){
             return origin;
         }
         if(Objects.nonNull(options.getExcludes())
                 && options.getExcludes().contains(replaceTableToken(origin))){
             return origin;
         }
-        if(origin.endsWith(SUFFIX_TOKEN)){
-            StringBuilder builder = new StringBuilder(origin);
-            builder.deleteCharAt(builder.length() - 1)
-                    .append(options.getSuffix())
-                    .append(SUFFIX_TOKEN);
-            return builder.toString();
-        }else{
+        if(options.getRenames().containsKey(origin)){
+            return options.getRenames().getOrDefault(origin,origin);
+        }
+        if(Objects.nonNull(options.getSuffix())){
+            if(origin.endsWith(SUFFIX_TOKEN)){
+                StringBuilder builder = new StringBuilder(origin);
+                builder.deleteCharAt(builder.length() - 1)
+                        .append(options.getSuffix())
+                        .append(SUFFIX_TOKEN);
+                return builder.toString();
+            }
             return origin.concat(options.getSuffix());
         }
+        return origin;
     }
 
     private String replaceTableToken(String origin) {

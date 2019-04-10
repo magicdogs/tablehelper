@@ -12,8 +12,8 @@ public class TableNameHelper {
 
     private static final ThreadLocal<Options> SUFFIX_THREAD_LOCAL = new ThreadLocal<>();
 
-    public static Options suffix(String name){
-        Options options = new Options(name);
+    public static Options options(){
+        Options options = new Options();
         SUFFIX_THREAD_LOCAL.set(options);
         return options;
     }
