@@ -4,6 +4,7 @@
 
 基于springboot2开发，实现了自动装配。完美兼容 pagehelper 插件，只捕获处理 select,insert,delete,update 语句。项目地址: tablehelper
 
+blog 地址: https://magicdogs.github.io/blog/2019-03/mybatis%E8%A1%A8%E5%90%8D%E4%BF%AE%E6%94%B9%E6%8F%92%E4%BB%B6/
 
 MAVEN使用姿势
 <dependency>
